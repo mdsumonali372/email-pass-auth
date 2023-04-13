@@ -1,16 +1,30 @@
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 import React, { useState } from "react";
+import app from "../../firebase/firebase.config";
 
 const Register = () => {
   const [email, setEmail] = useState("");
   const handleFormSubmit = (event) => {
+    // 1 prevent page refresh stop after submit
     event.preventDefault();
+    // 2 collect form data
     const email = event.target.email.value;
     const password = event.target.password.value;
     console.log(email, password);
+    // create new user
+    const auth = getAuth(app);
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((result) => {
+        const loggedUser = result.user;
+        console.log(loggedUser);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
   const handleEmail = (event) => {
     // console.log(event.target.value);
-    setEmail(event.target.value);
+    // setEmail(event.target.value);
   };
 
   const handlePasswordBlur = (event) => {
