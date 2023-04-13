@@ -3,13 +3,25 @@ import React, { useState } from "react";
 import app from "../../firebase/firebase.config";
 
 const Register = () => {
-  const [email, setEmail] = useState("");
+  const [regiError, setRegiError] = useState("");
+  const [success, setSuccess] = useState("");
   const handleFormSubmit = (event) => {
     // 1 prevent page refresh stop after submit
     event.preventDefault();
+    setSuccess("");
     // 2 collect form data
     const email = event.target.email.value;
     const password = event.target.password.value;
+    if (!/(?=.*[A-Z])/.test(password)) {
+      setRegiError("Please add at least one uppercase");
+      return;
+    } else if (!/(?=.*[0-9].*[0-9])/.test(password)) {
+      setRegiError("Please add at least two number");
+      return;
+    } else if (password.length < 6) {
+      setRegiError("Please add at least 6 character length");
+      return;
+    }
     console.log(email, password);
     // create new user
     const auth = getAuth(app);
@@ -17,9 +29,12 @@ const Register = () => {
       .then((result) => {
         const loggedUser = result.user;
         console.log(loggedUser);
+        setRegiError("");
+        event.target.reset();
+        setSuccess("Create SuccessFully");
       })
       .catch((error) => {
-        console.error(error);
+        setRegiError(error.message);
       });
   };
   const handleEmail = (event) => {
@@ -47,6 +62,7 @@ const Register = () => {
           name="email"
           id="email"
           placeholder="Your Email"
+          required
         />
         <input
           onBlur={handlePasswordBlur}
@@ -55,7 +71,10 @@ const Register = () => {
           name="password"
           id="password"
           placeholder="Your Password"
+          required
         />
+        <p className="text-red-600">{regiError}</p>
+        <p className="text-purple-600">{success}</p>
         <button className="btn btn-secondary">Register</button>
       </form>
     </div>
