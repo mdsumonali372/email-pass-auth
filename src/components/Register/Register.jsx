@@ -1,6 +1,12 @@
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  sendEmailVerification,
+} from "firebase/auth";
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import app from "../../firebase/firebase.config";
+const auth = getAuth(app);
 
 const Register = () => {
   const [regiError, setRegiError] = useState("");
@@ -24,7 +30,6 @@ const Register = () => {
     }
     console.log(email, password);
     // create new user
-    const auth = getAuth(app);
     createUserWithEmailAndPassword(auth, email, password)
       .then((result) => {
         const loggedUser = result.user;
@@ -32,11 +37,24 @@ const Register = () => {
         setRegiError("");
         event.target.reset();
         setSuccess("Create SuccessFully");
+        sendVerificationEmail(loggedUser);
       })
       .catch((error) => {
         setRegiError(error.message);
       });
   };
+
+  const sendVerificationEmail = (user) => {
+    sendEmailVerification(user)
+      .then((result) => {
+        console.log(result);
+        alert("Please verify your mail");
+      })
+      .catch((error) => {
+        setRegiError(error.message);
+      });
+  };
+
   const handleEmail = (event) => {
     // console.log(event.target.value);
     // setEmail(event.target.value);
@@ -76,6 +94,9 @@ const Register = () => {
         <p className="text-red-600">{regiError}</p>
         <p className="text-purple-600">{success}</p>
         <button className="btn btn-secondary">Register</button>
+        <Link to="/login">
+          <button className="btn btn-primary">SignIn</button>
+        </Link>
       </form>
     </div>
   );
